@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import './style.css'
+import "./style.css";
 import Navbar from "./components/Navbar/Navbar";
 import Main from "./components/Main/Main";
 
-function App() {
-
+export default function App() {
   return (
     <>
-      <Navbar movies={movies} />
-      <Main/>
+      <Navbar />
+      <Main />
     </>
   );
 }
 
-export default App;

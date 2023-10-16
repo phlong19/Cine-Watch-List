@@ -1,9 +1,9 @@
 import "../../style.css";
 
-function NumResults({ movie }) {
+function NumResults() {
   return (
     <p className="num-results">
-      Found <strong>{movie.length}</strong> results
+      Found <strong>X</strong> results
     </p>
   );
 }
