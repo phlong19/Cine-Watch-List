@@ -1,18 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import "../../style.css";
-import ListBox from "./ListBox";
-import WatchedBox from "./WatchedBox";
-import MovieList from "./MovieList";
 
-function Main({ movies }) {
-  return (
-    <main className="main">
-      <ListBox>
-        <MovieList movies={movies} />
-      </ListBox>
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
 export default Main;

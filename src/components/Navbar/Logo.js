@@ -4,7 +4,7 @@ function Logo() {
   return (
     <div className="logo">
       <span role="img">🍿</span>
-      <h1>Cine WatchList</h1>
+      <h1>Cine Watch List</h1>
     </div>
   );
 }
