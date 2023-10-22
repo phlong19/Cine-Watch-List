@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./style.css";
 import Navbar from "./components/Navbar/Navbar";
 import Main from "./components/Main/Main";
@@ -8,7 +8,7 @@ import Box from "./components/UI/Box";
 import MovieList from "./components/Main/MovieList";
 import WatchedSummary from "./components/Main/WatchedSummary";
 import WatchedMoviesList from "./components/Main/WatchedMoviesList";
-import StarRating from "./components/UI/StarRating";
+import Loader from "./components/UI/Loader";
 
 const tempMovieData = [
   {
@@ -57,9 +57,23 @@ const tempWatchedData = [
   },
 ];
 
+const key = process.env.REACT_APP_KEY;
+
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      const res = await fetch(`http://www.omdbapi.com/?apikey=${key}&s=logan`);
+      const data = await res.json();
+      setMovies(data.Search);
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -69,31 +83,24 @@ export default function App() {
       </Navbar>
 
       <Main>
-        <Box>
-          <MovieList movies={movies} />
-          <StarRating
-            maxRating={5}
-            size={28}
-            messages={["Suck", "Bad", "Fine", "Good", "Amazing"]}
-          />
-        </Box>
+        <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box>
 
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
-          <Test />
+          {/* <Test /> */}
         </Box>
       </Main>
     </>
   );
 }
 
-function Test() {
-  const [rating, setRating] = useState(0);
-  return (
-    <div>
-      <StarRating color="aqua" size={24} onSetRating={setRating} />
-      <p>This movie has {rating} star rating.</p>
-    </div>
-  );
-}
+// function Test() {
+//   const [rating, setRating] = useState(0);
+//   return (
+//     <div>
+//       <StarRating maxRating={5} size={28} messages={["Suck", "Bad", "Fine", "Good", "Amazing"]} />
+//       <p>This movie has {rating} star rating.</p>
+//     </div>
+//   );
+// }
