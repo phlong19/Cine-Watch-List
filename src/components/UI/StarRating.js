@@ -15,11 +15,12 @@ function StarRating({
   color = "#fcc419",
   size = 36,
   className = "",
+  initStar = 0,
   messages = [],
   onSetRating,
 }) {
   const [rating, setRating] = useState(0);
-  const [tempRating, setTempRating] = useState(0);
+  const [tempRating, setTempRating] = useState(initStar);
 
   const handleRating = (rate) => {
     setRating(rate);
