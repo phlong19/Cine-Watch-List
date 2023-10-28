@@ -23,6 +23,8 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
     Genre: genre,
   } = movie;
 
+  const userRating = watched.filter((x) => x.imdbID === id)[0]?.userRating;
+
   function handleAddNewWatched() {
     const newWatchedMovie = {
       imdbID: id,
@@ -34,9 +36,25 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
       userRating: rating,
     };
 
-    onAddWatched(newWatchedMovie, id, rating);
+    onAddWatched(newWatchedMovie);
     onSetSelectedID(null);
   }
+
+  useEffect(
+    function () {
+      const callback = function (e) {
+        if (e.key === "Escape") {
+          onSetSelectedID();
+        }
+      };
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onSetSelectedID]
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -74,12 +92,6 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
     [title]
   );
 
-  let check = watched.find((v) => v.imdbID === id);
-  let userRating;
-  if (check) {
-    userRating = check.userRating;
-  }
-
   return (
     <>
       {isLoading ? (
@@ -105,10 +117,16 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating onSetRating={setRating} initStar={userRating} />
+              {!userRating ? (
+                <StarRating onSetRating={setRating} />
+              ) : (
+                <p style={{ fontSize: "larger" }}>
+                  <em>You rated this movie {userRating} ⭐</em>
+                </p>
+              )}
               {rating > 0 && (
                 <button className="btn-add" onClick={handleAddNewWatched}>
-                  {!check ? `+ Add to watched list` : "Update your rating"}
+                  + Add to watched list
                 </button>
               )}
             </div>

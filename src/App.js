@@ -17,38 +17,44 @@ const key = process.env.REACT_APP_KEY;
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedID, setSelectedID] = useState(null);
+
+  const [watched, setWatched] = useState(function () {
+    const storedValue = JSON.parse(localStorage.getItem("watched")) || [];
+    return storedValue;
+  });
 
   function handleSelected(id) {
     setSelectedID((selectedId) => (selectedId === id ? null : id));
   }
 
-  function handleAddWatched(movie, id, newRating) {
-    if (watched.some((v) => v.imdbID === id)) {
-      const newWatched = watched.map((m) =>
-        m.imdbID === id ? { ...m, userRating: newRating } : m
-      );
-      setWatched(newWatched);
-    } else {
-      setWatched((watched) => [...watched, movie]);
-    }
+  function handleAddWatched(movie) {
+    setWatched((watched) => [...watched, movie]);
   }
 
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((m) => m.imdbID !== id));
   }
 
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
+
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchData() {
       try {
         setIsLoading(true);
         setError("");
 
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${key}&s=${query}`
+          `http://www.omdbapi.com/?apikey=${key}&s=${query}`,
+          { signal: controller.signal }
         );
 
         if (!res.ok) {
@@ -61,9 +67,11 @@ export default function App() {
         }
 
         setMovies(data.Search);
+        setError("");
       } catch (err) {
-        console.log(err);
-        setError(err.message);
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -75,6 +83,11 @@ export default function App() {
     }
 
     fetchData();
+    handleSelected();
+
+    return function () {
+      controller.abort();
+    };
   }, [query]);
 
   return (
