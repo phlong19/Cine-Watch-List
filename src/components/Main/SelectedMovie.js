@@ -1,7 +1,8 @@
 import "../../style.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Loader from "../UI/Loader";
 import StarRating from "../UI/StarRating";
+import { useKey } from "../../useKey";
 
 const key = process.env.REACT_APP_KEY;
 
@@ -25,6 +26,8 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
 
   const userRating = watched.filter((x) => x.imdbID === id)[0]?.userRating;
 
+  const countRef = useRef(0);
+
   function handleAddNewWatched() {
     const newWatchedMovie = {
       imdbID: id,
@@ -34,6 +37,7 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ")[0]),
       userRating: rating,
+      userRatingDecisions: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
@@ -42,19 +46,12 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
 
   useEffect(
     function () {
-      const callback = function (e) {
-        if (e.key === "Escape") {
-          onSetSelectedID();
-        }
-      };
-      document.addEventListener("keydown", callback);
-
-      return function () {
-        document.removeEventListener("keydown", callback);
-      };
+      if (rating) countRef.current++;
     },
-    [onSetSelectedID]
+    [rating]
   );
+
+  useKey("Escape", onSetSelectedID);
 
   useEffect(() => {
     async function fetchData() {
