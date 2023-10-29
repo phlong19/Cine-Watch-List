@@ -58,7 +58,7 @@ function SelectedMovie({ id, onSetSelectedID, onAddWatched, watched }) {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${key}&i=${id}`
+          `https://www.omdbapi.com/?apikey=${key}&i=${id}`
         );
         if (!res.ok) {
           throw new Error("fetch movie failed");
